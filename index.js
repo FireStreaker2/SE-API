@@ -30,6 +30,20 @@ app.get("/bing/:query", async (req, res) => {
 		});
 });
 
+app.get("/brave/:query", async (req, res) => {
+	await axios
+		.get(`https://search.brave.com/api/suggest?q=${req.params.query}`)
+		.then((response) => {
+			const data = response.data[1];
+
+			res.json({ Results: data });
+		})
+		.catch((error) => {
+			console.error(error);
+			res.json({ Status: 500, Message: "Internal Server Error" });
+		});
+});
+
 app.get("/duckduckgo/:query", async (req, res) => {
 	await axios
 		.get(`https://duckduckgo.com/ac/?q=${req.params.query}&kl=wt-wt`)
