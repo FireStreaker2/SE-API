@@ -10,22 +10,36 @@ app.get("/", (req, res) => {
 });
 
 app.get("/bing/:query", async (req, res) => {
-	const query = req.params.query;
 	await axios
 		.get(
-			`https://www.bing.com/AS/Suggestions?pt=page.chrometab&mkt=en-us&qry=${query}&cvid=727`
+			`https://www.bing.com/AS/Suggestions?pt=page.chrometab&mkt=en-us&qry=${req.params.query}&cvid=727`
 		)
 		.then((response) => {
-			let results = [];
-			let match;
-			let regex = />([^<]+)<\/span>/g;
-			let data = response.data;
-			data = data.replace(/<strong>/g, "");
-			data = data.replace(/<\/strong>/g, "");
+			const data = response.data.replace(/<\/?strong>/g, "");
 
-			while ((match = regex.exec(data)) !== null) {
-				results.push(match[1]);
-			}
+			const results = Array.from(
+				data.matchAll(/>([^<]+)<\/span>/g),
+				(match) => match[1]
+			);
+
+			res.json({ Results: results });
+		})
+		.catch((error) => {
+			console.error(error);
+			res.json({ Status: 500, Message: "Internal Server Error" });
+		});
+});
+
+app.get("/duckduckgo/:query", async (req, res) => {
+	await axios
+		.get(`https://duckduckgo.com/ac/?q=${req.params.query}&kl=wt-wt`)
+		.then((response) => {
+			const data = response.data;
+			const results = [];
+
+			data.forEach((item) => {
+				results.push(item.phrase);
+			});
 
 			res.json({ Results: results });
 		})
