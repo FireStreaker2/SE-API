@@ -63,6 +63,24 @@ app.get("/duckduckgo/:query", async (req, res) => {
 		});
 });
 
+app.get("/yahoo/:query", async (req, res) => {
+	await axios
+		.get(
+			`https://search.yahoo.com/sugg/gossip/gossip-us-fastbreak/?pq=&command=${req.params.query}&output=sd1`
+		)
+		.then((response) => {
+			const data = response.data;
+
+			const results = data.r.filter((item) => item.k).map((item) => item.k);
+
+			res.json({ Results: results });
+		})
+		.catch((error) => {
+			console.error(error);
+			res.json({ Status: 500, Message: "Internal Server Error" });
+		});
+});
+
 app.listen(port, () => {
 	console.log(`App is running at http://localhost:${port}`);
 });
