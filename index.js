@@ -133,6 +133,24 @@ app.get("/yahoo/:query", async (req, res) => {
 		});
 });
 
+app.get("/yandex/:query", async (req, res) => {
+	await axios
+		.get(`https://yandex.com/suggest/suggest-ya.cgi?part=${req.params.query}`)
+		.then((response) => {
+			const data = JSON.parse(
+				response.data.replace("suggest.apply(", "").replace(",[])", "")
+			);
+
+			const results = data[1];
+
+			res.json({ Results: results });
+		})
+		.catch((error) => {
+			console.error(error);
+			res.json({ Status: 500, Message: "Internal Server Error" });
+		});
+});
+
 app.listen(port, () => {
 	console.log(`App is running at http://localhost:${port}`);
 });
