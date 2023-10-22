@@ -5,7 +5,7 @@ const port = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
 	res.send(
-		"<script>window.location.href = 'https://github.com/FireStreaker2/SE-API'</script>"
+		`<script>window.location.href = "https://github.com/FireStreaker2/SE-API"</script>`
 	);
 });
 
@@ -70,6 +70,20 @@ app.get("/duckduckgo/:query", async (req, res) => {
 			data.forEach((item) => {
 				results.push(item.phrase);
 			});
+
+			res.json({ Results: results });
+		})
+		.catch((error) => {
+			console.error(error);
+			res.json({ Status: 500, Message: "Internal Server Error" });
+		});
+});
+
+app.get("/ecosia/:query", async (req, res) => {
+	await axios
+		.get(`https://ac.ecosia.org/?q=${req.params.query}`)
+		.then((response) => {
+			const results = response.data.suggestions;
 
 			res.json({ Results: results });
 		})
