@@ -30,13 +30,29 @@ app.get("/bing/:query", async (req, res) => {
 		});
 });
 
+app.get("/baidu/:query", async (req, res) => {
+	await axios
+		.get(`https://www.baidu.com/sugrec?ie=utf-8&prod=pc&wd=${req.params.query}`)
+		.then((response) => {
+			const data = response.data;
+
+			const results = data.g.map((item) => item.q);
+
+			res.json({ Results: results });
+		})
+		.catch((error) => {
+			console.error(error);
+			res.json({ Status: 500, Message: "Internal Server Error" });
+		});
+});
+
 app.get("/brave/:query", async (req, res) => {
 	await axios
 		.get(`https://search.brave.com/api/suggest?q=${req.params.query}`)
 		.then((response) => {
-			const data = response.data[1];
+			const results = response.data[1];
 
-			res.json({ Results: data });
+			res.json({ Results: results });
 		})
 		.catch((error) => {
 			console.error(error);
