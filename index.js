@@ -63,6 +63,28 @@ app.get("/duckduckgo/:query", async (req, res) => {
 		});
 });
 
+app.get("/google/:query", async (req, res) => {
+	await axios
+		.get(
+			`https://www.google.com/complete/search?q=${req.params.query}&cp=727&client=gws-wiz`
+		)
+		.then((response) => {
+			const data = JSON.parse(
+				response.data.replace("window.google.ac.h(", "").replace("])", "]")
+			);
+
+			const results = data[0]
+				.map((item) => item[0])
+				.map((element) => element.replace(/<\/?b>/g, ""));
+
+			res.json({ Results: results });
+		})
+		.catch((error) => {
+			console.error(error);
+			res.json({ Status: 500, Message: "Internal Server Error" });
+		});
+});
+
 app.get("/yahoo/:query", async (req, res) => {
 	await axios
 		.get(
